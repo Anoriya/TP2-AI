@@ -1,5 +1,5 @@
 from classes import *
-
+import copy
 
 def listSubitute(list, dict):
     i = 0
@@ -15,10 +15,13 @@ def listSubitute(list, dict):
 
 def opeartionSubtitue(operation: Operation, dict):
     for d in dict:
+
         if d in operation.att1:
             operation.att1 = operation.att1.replace(d, dict[d])
+            print("ATTT1111", operation.att1)
         if d in operation.att2:
             operation.att2 = operation.att2.replace(d, dict[d])
+            print("ATTT2", operation.att2)
 
     # Calculating operations case att 1 or att 2 is an operation
     if '?x' not in operation.att1 and '?y' not in operation.att1:
@@ -77,7 +80,7 @@ def unifier(terms1, terms2):
     Z1 = unifier(F1, F2)
     if Z1 is None:
         return None
-    print(Z1)
+    print("FF", Z1)
 
     print('T1=', T1)
 
@@ -96,11 +99,10 @@ def unifier(terms1, terms2):
     return Z2
 
 
-def genererConclusionUnifies(base: BaseDeConnaissance, pred: Predicat):
-    regles = base.regles
-    faits = base.faits
-
+def genererConclusionUnifies(reglos, pred: Predicat):
     reglesExecutable = []
+    # Deep copy copy the variable and change the adress (recursively)
+    regles = copy.deepcopy(reglos)
 
     for regle in regles:
         print('rang : ', regle.rang)
@@ -108,21 +110,21 @@ def genererConclusionUnifies(base: BaseDeConnaissance, pred: Predicat):
         predicatvals1 = regle.predicats[0].vals.copy()
         predicatvals2 = pred.vals.copy()
         unificateur = unifier(predicatvals1, predicatvals2)
+
         if unificateur != None:
             i = 0
             test = True
-            print(len(regle.operations))
             while i < len(regle.operations) and test:
                 operation = opeartionSubtitue(regle.operations[i], unificateur)
+                print("OPERATION", i, operation)
                 i += 1
                 if not operation.verifOperation():
                     test = False
             if test:
+                print("REGLE A EXECUTER", regle.rang)
                 reglesExecutable.append({regle.rang: unificateur})
-    for reglee in reglesExecutable:
-        print("KEEEEEEEEEY", reglee)
 
-    conclusionUnifies = unifierConclusion(reglesExecutable, base)
+    conclusionUnifies = unifierConclusion(reglesExecutable, regles)
     for conc in conclusionUnifies:
         print("CO§NCCCCCC", conc)
     print('-----------------')
@@ -132,21 +134,26 @@ def genererConclusionUnifies(base: BaseDeConnaissance, pred: Predicat):
     return conclusionUnifies
 
 
-def unifierConclusion(reglesDeclenchables, baseDeConnaissance):
+def unifierConclusion(reglesDeclenchables, regles):
     # Contient les conclusion unifiées
+    x = '?x'
+    y = '?y'
     conclusionsUnifies = []
 
     for regleDeclenchable in reglesDeclenchables:
 
         key = list(regleDeclenchable.keys())[0]
         value = list(regleDeclenchable.values())[0]
-        for regle in baseDeConnaissance.regles:
+
+        for regle in regles:
             if regle.rang == key:
                 conclusion = regle.conclusion
 
                 # Extracting variables from unification result
-                y = value['?y']
-                x = value['?x']
+                if '?y' in value.keys():
+                    y = value['?y']
+                if '?x' in value.keys():
+                    x = value['?x']
 
                 # Remplacer les variables de la conclusion selon l'unification
                 substitutionX = [variable.replace('?x', x) if '?x' in variable else variable for variable in

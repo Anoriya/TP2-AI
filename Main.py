@@ -1,6 +1,19 @@
 from functions import *
 
-base = BaseDeConnaissance('C:/Users/Kalelt\'has/Desktop/My GL4/AI/Tp 2/cruches.txt')
+
+# Function to check the existence of un predicat dans un tableaux de predicats
+def exist(conclusion, predicats):
+    if not predicats:
+        return False
+    verif = False
+    for predicat in predicats:
+        if predicat.vals[0] == conclusion.vals[0] and predicat.vals[1] == conclusion.vals[1]:
+            return True
+
+    return verif
+
+
+base = BaseDeConnaissance('C:/Users/User/Desktop/AI/TP2-AI/cruches.txt')
 
 # for regle in (genererConclusionUnifies(base, Predicat.extractPredicat('cruchesAetB(4,0)'))):
 #     pass
@@ -9,22 +22,20 @@ EtatInit = base.faits[0].predicat
 graphe = Graph(EtatInit)
 closedStates = []
 possibleStates = [EtatInit]
-
-# for conc in genererConclusionUnifies(base, EtatInit):
-#     possibleStates.append(conc)
+i = 0
 
 while possibleStates:
+
     state = possibleStates.pop(0)
     closedStates.append(state)
-    base.faits.append(state)
-    possibleConclusions = genererConclusionUnifies(base, state)
-    print("AAAAAA", state)
-    for possible in possibleConclusions:
-        print("HHHHH", possible)
+    base.faits = state
+    possibleConclusions = genererConclusionUnifies(base.regles, state)
+
     for conclusion in possibleConclusions:
         graphe.addEdge(state, conclusion)
-        if not conclusion in closedStates and not conclusion in possibleStates:
+        if not exist(conclusion, closedStates) and not exist(conclusion, possibleStates):
             possibleStates.append(conclusion)
+    i += 1
 
 for key in graphe.graph:
     print("*********")
