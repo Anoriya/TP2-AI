@@ -163,26 +163,27 @@ class Graph:
     def addEdge(self, u, v):
         self.graph[u].append(v)
 
-        # A function to perform a Depth-Limited search
-        # from given source 'src'
-        def rechercheProfendeurLimite(self, src, target, maxDepth):
+    # A function to perform a Depth-Limited search
+    # from given source 'src'
+    def rechercheProfendeurLimite(self, src, target, maxDepth):
 
-            if src == target: return True
+        if src.vals[0] == target.vals[0] and src.vals[1] == target.vals[1]:
+            return True
 
-            # If reached the maximum depth, stop recursing.
-            if maxDepth <= 0: return False
+        # If reached the maximum depth, stop recursing.
+        if maxDepth <= 0: return False
 
-            # Recur for all the vertices adjacent to this vertex
-            for i in self.graph[src]:
-                if self.rechercheProfendeurLimite(i, target, maxDepth - 1):
-                    return True
-            return False
+        # Recur for all the vertices adjacent to this vertex
+        for i in self.graph[src]:
+            if self.rechercheProfendeurLimite(i, target, maxDepth - 1):
+                return True
+        return False
 
-        def rechercheProfendeurLimiteIteratif(self, src, target, maxDepth):
+    def rechercheProfendeurLimiteIteratif(self, src, target, maxDepth):
 
-            # Repeatedly depth-limit search till the
-            # maximum depth
-            for i in range(maxDepth):
-                if self.rechercheProfendeurLimite(src, target, i):
-                    return True
-            return False
+        # Repeatedly depth-limit search till the
+        # maximum depth
+        for i in range(maxDepth):
+            if self.rechercheProfendeurLimite(src, target, i):
+                return True
+        return False

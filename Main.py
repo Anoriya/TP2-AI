@@ -43,3 +43,6 @@ for key in graphe.graph:
     print("Values")
     for val in graphe.graph[key]:
         print("fils: ", val.nom, '(', val.vals, ')')
+
+test = Predicat("cruchesAetB", ['0', '20'])
+print(graphe.rechercheProfendeurLimiteIteratif(graphe.V, test, 10))
