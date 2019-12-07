@@ -24,6 +24,7 @@ closedStates = []
 possibleStates = [EtatInit]
 i = 0
 
+# Graph construction
 while possibleStates:
 
     state = possibleStates.pop(0)
@@ -44,8 +45,15 @@ for key in graphe.graph:
     for val in graphe.graph[key]:
         print("fils: ", val.nom, '(', val.vals, ')')
 
-test = Predicat("cruchesAetB", ['4', '0'])
-# print(graphe.rechercheProfendeurLimiteIteratif(graphe.V, test, 10))
-result, came_from = graphe.a_star_search(graphe.V, test)
-for key in came_from:
-    print(key, "came from", came_from[key])
+test = Predicat("cruchesAetB", ['4', '2'])
+# chemin = []
+# print(graphe.rechercheProfendeurLimiteIteratif(graphe.V, test, 10, chemin))
+# chemin = functions.prepareChemin(chemin, graphe.V) # Function that modifies the path in order to get it in a good format
+# for chem in chemin:
+#     print(chem)
+
+result, parcours = graphe.a_star_search(graphe.V, test)
+for chem in parcours:
+    print(chem)
+# for key in came_from:
+#     print(key, "came from", came_from[key])

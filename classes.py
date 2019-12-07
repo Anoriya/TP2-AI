@@ -185,9 +185,10 @@ class Graph:
 
     # A function to perform a Depth-Limited search
     # from given source 'src'
-    def rechercheProfendeurLimite(self, src, target, maxDepth):
+    def rechercheProfendeurLimite(self, src, target, maxDepth, chemin):
 
         if src.vals[0] == target.vals[0] and src.vals[1] == target.vals[1]:
+            chemin.append(src)
             return True
 
         # If reached the maximum depth, stop recursing.
@@ -195,16 +196,17 @@ class Graph:
 
         # Recur for all the vertices adjacent to this vertex
         for i in self.graph[src]:
-            if self.rechercheProfendeurLimite(i, target, maxDepth - 1):
+            if self.rechercheProfendeurLimite(i, target, maxDepth - 1, chemin):
+                chemin.append(i)
                 return True
         return False
 
-    def rechercheProfendeurLimiteIteratif(self, src, target, maxDepth):
+    def rechercheProfendeurLimiteIteratif(self, src, target, maxDepth, chemin):
 
         # Repeatedly depth-limit search till the
         # maximum depth
         for i in range(maxDepth):
-            if self.rechercheProfendeurLimite(src, target, i):
+            if self.rechercheProfendeurLimite(src, target, i, chemin):
                 return True
         return False
 
@@ -213,12 +215,15 @@ class Graph:
         cost_so_far = {start: 0}
         came_from = {start: None}
         closed = []
+        parcours = []
         while openstates:
             selected, index = functions.getNodewithLowestCost(openstates, cost_so_far)
             openstates.pop(index)
             closed.append(selected)
+            parcours.append(selected)
             if selected.vals[0] == goal.vals[0] and selected.vals[1] == goal.vals[1]:
-                return True, came_from
+                parcours.append(selected)
+                return True, parcours
             for child in self.graph[selected]:
                 if child not in openstates and child not in closed:
                     openstates.append(child)

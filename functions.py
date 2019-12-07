@@ -187,9 +187,7 @@ def heuristic(predicat):
 
 def getNodewithLowestCost(list, cost_so_far):
     minNode = list[0]
-    print("INN")
     for node in list:
-        print(node)
         if (heuristic(node) + getCostFromList(cost_so_far, node)) < (
                 heuristic(minNode) + getCostFromList(cost_so_far, minNode)):
             minNode = node
@@ -210,3 +208,10 @@ def getCostFromList(dictionnaire, predicat):
         if key.vals[0] == predicat.vals[0] and key.vals[1] == predicat.vals[1]:
             return dictionnaire[key]
     return None
+
+
+def prepareChemin(chemin, V):
+    chemin.append(V)
+    chemin.pop(0)
+    chemin.reverse()
+    return chemin
