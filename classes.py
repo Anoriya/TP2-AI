@@ -1,4 +1,7 @@
-from collections import defaultdict
+import collections
+import heapq
+
+import functions
 
 
 class Fait:
@@ -147,6 +150,20 @@ class BaseDeConnaissance:
         return string
 
 
+class PriorityQueue:
+    def __init__(self):
+        self.elements = []
+
+    def empty(self):
+        return len(self.elements) == 0
+
+    def put(self, item, priority):
+        heapq.heappush(self.elements, (priority, item))
+
+    def get(self):
+        return heapq.heappop(self.elements)[1]
+
+
 # This class represents a directed graph using adjacency
 # list representation
 class Graph:
@@ -156,7 +173,10 @@ class Graph:
         self.V = vertices
 
         # default dictionary to store graph
-        self.graph = defaultdict(list)
+        self.graph = collections.defaultdict(list)
+
+        def neighbors(self, id):
+            return self.graph[id]
 
         # function to add an edge to graph
 
@@ -186,4 +206,35 @@ class Graph:
         for i in range(maxDepth):
             if self.rechercheProfendeurLimite(src, target, i):
                 return True
+        return False
+
+    def a_star_search(self, start, goal):
+        openstates = [start]
+        cost_so_far = {start: 0}
+        came_from = {start: None}
+        closed = []
+        while openstates:
+            selected, index = functions.getNodewithLowestCost(openstates, cost_so_far)
+            openstates.pop(index)
+            closed.append(selected)
+            if selected.vals[0] == goal.vals[0] and selected.vals[1] == goal.vals[1]:
+                return True, came_from
+            for child in self.graph[selected]:
+                if child not in openstates and child not in closed:
+                    openstates.append(child)
+                    # came_from[child] = selected
+                    functions.addPredicatToDict(child, came_from, selected)
+                    new_cost = functions.getCostFromList(cost_so_far, selected) + 1 + functions.heuristic(child)
+                    functions.addPredicatToDict(child, cost_so_far, new_cost)
+                    # cost_so_far[child] = new_cost
+                elif child in openstates or child in closed and functions.getCostFromList(cost_so_far,
+                                                                                          selected) + 1 < functions.getCostFromList(
+                        cost_so_far, child):
+                    # cost_so_far[child] = cost_so_far[selected] + 1
+                    functions.addPredicatToDict(child, cost_so_far,
+                                                functions.getCostFromList(cost_so_far, selected) + 1)
+                    openstates.append(child)
+                    # came_from[child] = selected
+                    functions.addPredicatToDict(child, came_from, selected)
+
         return False

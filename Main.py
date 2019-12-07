@@ -13,7 +13,7 @@ def exist(conclusion, predicats):
     return verif
 
 
-base = BaseDeConnaissance('C:/Users/User/Desktop/AI/TP2-AI/cruches.txt')
+base = BaseDeConnaissance("C:/Users/Kalelt'has/Desktop/My GL4/AI/Tp 2/cruches.txt")
 
 # for regle in (genererConclusionUnifies(base, Predicat.extractPredicat('cruchesAetB(4,0)'))):
 #     pass
@@ -44,5 +44,8 @@ for key in graphe.graph:
     for val in graphe.graph[key]:
         print("fils: ", val.nom, '(', val.vals, ')')
 
-test = Predicat("cruchesAetB", ['0', '20'])
-print(graphe.rechercheProfendeurLimiteIteratif(graphe.V, test, 10))
+test = Predicat("cruchesAetB", ['4', '0'])
+# print(graphe.rechercheProfendeurLimiteIteratif(graphe.V, test, 10))
+result, came_from = graphe.a_star_search(graphe.V, test)
+for key in came_from:
+    print(key, "came from", came_from[key])

@@ -1,5 +1,7 @@
-from classes import *
 import copy
+
+from classes import *
+
 
 def listSubitute(list, dict):
     i = 0
@@ -171,3 +173,40 @@ def unifierConclusion(reglesDeclenchables, regles):
                 conclusionsUnifies.append(conclusion)
                 break
     return conclusionsUnifies
+
+
+def heuristic(predicat):
+    if eval(predicat.vals[0]) == 2:
+        return 0
+    if (eval(predicat.vals[0]) + eval(predicat.vals[1])) < 2:
+        return 7
+    if eval(predicat.vals[1]) > 2:
+        return 3
+    return 1
+
+
+def getNodewithLowestCost(list, cost_so_far):
+    minNode = list[0]
+    print("INN")
+    for node in list:
+        print(node)
+        if (heuristic(node) + getCostFromList(cost_so_far, node)) < (
+                heuristic(minNode) + getCostFromList(cost_so_far, minNode)):
+            minNode = node
+    return minNode, list.index(minNode)
+
+
+def addPredicatToDict(predicat, dictionnaire, new_val):
+    for key in dictionnaire:
+        if key.vals[0] == predicat.vals[0] and key.vals[1] == predicat.vals[1]:
+            dictionnaire[key] = new_val
+            return True
+    dictionnaire[predicat] = new_val
+    return True
+
+
+def getCostFromList(dictionnaire, predicat):
+    for key in dictionnaire:
+        if key.vals[0] == predicat.vals[0] and key.vals[1] == predicat.vals[1]:
+            return dictionnaire[key]
+    return None
