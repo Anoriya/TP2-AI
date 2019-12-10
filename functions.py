@@ -215,3 +215,14 @@ def prepareChemin(chemin, V):
     chemin.pop(0)
     chemin.reverse()
     return chemin
+
+# Function to check the existence of un predicat dans un tableaux de predicats
+def exist(conclusion, predicats):
+    if not predicats:
+        return False
+    verif = False
+    for predicat in predicats:
+        if predicat.vals[0] == conclusion.vals[0] and predicat.vals[1] == conclusion.vals[1]:
+            return True
+
+    return verif

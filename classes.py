@@ -38,7 +38,7 @@ class Regle:
         regle.rang = text.split(':')[0]
         premisses = text.split(':')[1].split(' alors ')[0]
         conclusion = text.split(':')[1].split(' alors ')[1]
-        regle.conclusion = Predicat.extractConclusion(conclusion)
+        regle.conclusion = Predicat.extractConclusion(conclusion,regle.rang)
         for premisse in premisses.split(' et '):
             if not (
                     '<=' in premisse or '>=' in premisse or '<' in premisse or '>' in premisse or '==' in premisse or '=' in premisse):
@@ -94,16 +94,17 @@ class Operation:
 
 
 class Predicat:
-    def __init__(self, nom, vals):
+    def __init__(self, nom, vals , regle):
         self.nom = nom
         self.vals = vals
+        self.regle = regle
 
     def __str__(self):
         return '\tpredicat: {},   vals:{}'.format(self.nom, self.vals)
 
     @staticmethod
     def extractPredicat(text):
-        predicat = Predicat('', [])
+        predicat = Predicat('', [], 'fait')
         predicat.nom = text.split('(')[0].strip()
         vals = text.split('(')[1].split(')')[0].split(',')
         for val in vals:
@@ -111,8 +112,8 @@ class Predicat:
         return predicat
 
     @staticmethod
-    def extractConclusion(conclusion):
-        predicat = Predicat('', [])
+    def extractConclusion(conclusion,rang_regle):
+        predicat = Predicat('', [], rang_regle)
         predicat.nom = conclusion.split('( ')[0].strip()
         vals = conclusion.split('( ')[1].strip()
         vals = list(vals)
@@ -183,6 +184,16 @@ class Graph:
     def addEdge(self, u, v):
         self.graph[u].append(v)
 
+    #Display graph
+    def graph_dispaly(self):
+        # Graph display
+        for key in self.graph:
+            print("*********")
+            print("Sommet: ", key.nom, '(', key.vals, ')')
+            print("Values")
+            for val in self.graph[key]:
+                print("fils: ", val.nom, '(', val.vals, ')')
+
     # A function to perform a Depth-Limited search
     # from given source 'src'
     def rechercheProfendeurLimite(self, src, target, maxDepth, chemin):
@@ -201,14 +212,30 @@ class Graph:
                 return True
         return False
 
+    def rechercheProfendeurLimiteseulinconnu(self, src, target, maxDepth, chemin):
+        if src.vals[0] == target.vals[0]:
+            chemin.append(src.vals[1])
+        if src.vals[1] == target.vals[1]:
+            chemin.append(src.vals[0])
+        if maxDepth <= 0:
+            for i in self.graph[src]:
+                self.rechercheProfendeurLimiteseulinconnu(i, target, maxDepth - 1, chemin)
+        return chemin
+
     def rechercheProfendeurLimiteIteratif(self, src, target, maxDepth, chemin):
 
         # Repeatedly depth-limit search till the
         # maximum depth
-        for i in range(maxDepth):
-            if self.rechercheProfendeurLimite(src, target, i, chemin):
-                return True
-        return False
+        if not target.vals[0].isdigit() or not target.vals[1].isdigit():
+            for i in range(maxDepth):
+                return self.rechercheProfendeurLimiteseulinconnu(src, target, i, chemin)
+        else:
+            for i in range(maxDepth):
+                if self.rechercheProfendeurLimite(src, target, i, chemin):
+                    return True
+            return False
+
+
 
     def a_star_search(self, start, goal):
         openstates = [start]
