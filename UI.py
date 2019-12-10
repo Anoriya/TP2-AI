@@ -6,8 +6,10 @@
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QWidget
+from Main import *
 
 from classes import Predicat
 
@@ -16,6 +18,7 @@ class Ui_MainWindow(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.log_path  = ""
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -88,12 +91,12 @@ class Ui_MainWindow(QWidget):
         self.label_9 = QtWidgets.QLabel(self.centralwidget)
         self.label_9.setGeometry(QtCore.QRect(140, 480, 121, 16))
         self.label_9.setObjectName("label_9")
-        self.textEdit_9 = QtWidgets.QTextEdit(self.centralwidget)
-        self.textEdit_9.setGeometry(QtCore.QRect(140, 600, 631, 51))
-        self.textEdit_9.setObjectName("textEdit_9")
-        self.label_10 = QtWidgets.QLabel(self.centralwidget)
-        self.label_10.setGeometry(QtCore.QRect(140, 570, 55, 16))
-        self.label_10.setObjectName("label_10")
+        # self.textEdit_9 = QtWidgets.QTextEdit(self.centralwidget)
+        # self.textEdit_9.setGeometry(QtCore.QRect(140, 600, 631, 51))
+        # self.textEdit_9.setObjectName("textEdit_9")
+        # self.label_10 = QtWidgets.QLabel(self.centralwidget)
+        # self.label_10.setGeometry(QtCore.QRect(140, 570, 55, 16))
+        # self.label_10.setObjectName("label_10")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 872, 21))
@@ -107,6 +110,8 @@ class Ui_MainWindow(QWidget):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.pushButton_2.clicked.connect(self.openFileNameDialog)
+        self.toolButton.clicked.connect(self.openFileNameDialog_log)
+        self.pushButton.clicked.connect(self.resoudre)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -124,8 +129,8 @@ class Ui_MainWindow(QWidget):
         self.label_6.setText(_translate("MainWindow", "Valeur de y"))
         self.label_7.setText(_translate("MainWindow", "Valeur de x"))
         self.label_8.setText(_translate("MainWindow", "But"))
-        self.label_9.setText(_translate("MainWindow", "Règles appliqués"))
-        self.label_10.setText(_translate("MainWindow", "Parcours"))
+        self.label_9.setText(_translate("MainWindow", "Parcours"))
+        # self.label_10.setText(_translate("MainWindow", "Parcours"))
 
     def openFileNameDialog(self):
         options = QFileDialog.Options()
@@ -134,11 +139,27 @@ class Ui_MainWindow(QWidget):
                                                   "Text files (*);;Python Files (*.txt)", options=options)
         self.textEdit_5.setText(fileName)
 
-    def resoudre(self):
-        EtatInit = Predicat('cruchesAetB',[self.textEdit.toPlainText(),self.textEdit2.toPlainText()],'fait')
-        But = Predicat('cruchesAetB',[self.textEdit7.toPlainText(),self.textEdit6.toPlainText()],'')
-        resolver = Resolver(self.textEdit_5.toPlainText(),)
+    def openFileNameDialog_log(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+                                                  "Text files (*);;Python Files (*.txt)", options=options)
+        self.log_path = fileName
 
+    def resoudre(self):
+        self.textEdit_3.setText("")
+        self.textEdit_4.setText("")
+        self.textEdit_8.setText("")
+
+        path = self.textEdit_5.toPlainText()
+        EtatInit = Predicat('cruchesAetB', [self.textEdit.toPlainText(), self.textEdit_2.toPlainText()], 'fait')
+        But = Predicat('cruchesAetB', [self.textEdit_7.toPlainText(), self.textEdit_6.toPlainText()], 'but')
+        if self.radioButton.isChecked():
+            strat = "A*"
+        else:
+            strat = "idds"
+        resolver = Resolver(path, EtatInit, But, strat, self.textEdit_3, self.textEdit_4, self.textEdit_8)
+        resolver.start(self.log_path)
 
 if __name__ == "__main__":
     import sys

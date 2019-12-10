@@ -2,13 +2,15 @@ import copy
 
 from classes import *
 
+log_file = None
+
 
 def listSubitute(list, dict):
     i = 0
     while i < len(list):
         for d in dict:
             if list[i] == d:
-                print(list[i], dict[d])
+                log_file.write(str(list[i]) + str(dict[d]))
                 list[i] = dict[d]
                 break
         i += 1
@@ -20,10 +22,10 @@ def opeartionSubtitue(operation: Operation, dict):
 
         if d in operation.att1:
             operation.att1 = operation.att1.replace(d, dict[d])
-            print("ATTT1111", operation.att1)
+            log_file.write("Attribut 1" + operation.att1)
         if d in operation.att2:
             operation.att2 = operation.att2.replace(d, dict[d])
-            print("ATTT2", operation.att2)
+            log_file.write("Attribut 2" + operation.att2)
 
     # Calculating operations case att 1 or att 2 is an operation
     if '?x' not in operation.att1 and '?y' not in operation.att1:
@@ -44,13 +46,13 @@ def is_variable(expr):
 
 
 def unifier_atom(expr1, expr2):
-    print('unifier atome')
+    log_file.write('unifier atome')
 
     if is_atom(expr1):
         expr1 = expr1[0]
     if is_atom(expr2):
         expr1, expr2 = expr2[0], expr1
-    print(expr1, expr2)
+    log_file.write(str(expr1) + str(expr2))
     if expr1 == expr2:
         return {}
     if is_variable(expr2):
@@ -65,34 +67,34 @@ def unifier_atom(expr1, expr2):
 
 
 def unifier(terms1, terms2):
-    print('\n')
-    print('unifier', terms1, terms2)
+    log_file.write('\n')
+    log_file.write('unifier' + str(terms1) + str(terms2))
     if is_atom(terms1) or is_atom(terms2):
         return unifier_atom(terms1, terms2)
     F1, F2 = [], []
-    print(F1)
+    log_file.write(str(F1))
     F1.append(terms1.pop(0))
     T1 = terms1
     F2.append(terms2.pop(0))
     T2 = terms2
-    print('F1=', F1)
-    print('T1=', T1)
-    print('F2=', F2)
-    print('T2=', T2)
+    log_file.write('F1=' + str(F1))
+    log_file.write('T1=' + str(T1))
+    log_file.write('F2=' + str(F2))
+    log_file.write('T2=' + str(T2))
     Z1 = unifier(F1, F2)
     if Z1 is None:
         return None
-    print("FF", Z1)
+    log_file.write("FF" + str(Z1))
 
-    print('T1=', T1)
+    log_file.write('T1=' + str(T1))
 
-    print('T2=', T2)
+    log_file.write('T2=' + str(T2))
 
     T1 = listSubitute(T1, Z1)
     T2 = listSubitute(T2, Z1)
-    print('T1=', T1)
+    log_file.write('T1=' + str(T1))
 
-    print('T2=', T2)
+    log_file.write('T2=' + str(T2))
 
     Z2 = unifier(T1, T2)
     if Z2 is None:
@@ -101,14 +103,16 @@ def unifier(terms1, terms2):
     return Z2
 
 
-def genererConclusionUnifies(reglos, pred: Predicat):
+def genererConclusionUnifies(reglos, pred: Predicat, log_filez):
+    global log_file
+    log_file = log_filez
     reglesExecutable = []
     # Deep copy copy the variable and change the adress (recursively)
     regles = copy.deepcopy(reglos)
 
     for regle in regles:
-        print('rang : ', regle.rang)
-        print(pred)
+        log_file.write('rang : ' + regle.rang)
+        log_file.write(str(pred))
         predicatvals1 = regle.predicats[0].vals.copy()
         predicatvals2 = pred.vals.copy()
         unificateur = unifier(predicatvals1, predicatvals2)
@@ -118,21 +122,21 @@ def genererConclusionUnifies(reglos, pred: Predicat):
             test = True
             while i < len(regle.operations) and test:
                 operation = opeartionSubtitue(regle.operations[i], unificateur)
-                print("OPERATION", i, operation)
+                log_file.write("OPERATION " + str(i) + " " + str(operation))
                 i += 1
                 if not operation.verifOperation():
                     test = False
             if test:
-                print("REGLE A EXECUTER", regle.rang)
+                log_file.write("REGLE A EXECUTER " + regle.rang)
                 reglesExecutable.append({regle.rang: unificateur})
 
     conclusionUnifies = unifierConclusion(reglesExecutable, regles)
     for conc in conclusionUnifies:
-        print("CO§NCCCCCC", conc)
-    print('-----------------')
+        log_file.write("Conclusion unifiées : " + str(conc))
+    log_file.write("\n" + '-----------------' + "\n")
     for conclusion in conclusionUnifies:
-        print(conclusion)
-    print('-----------------')
+        log_file.write(str(conclusion))
+    log_file.write("\n" + '-----------------' + "\n")
     return conclusionUnifies
 
 
@@ -215,6 +219,7 @@ def prepareChemin(chemin, V):
     chemin.pop(0)
     chemin.reverse()
     return chemin
+
 
 # Function to check the existence of un predicat dans un tableaux de predicats
 def exist(conclusion, predicats):

@@ -185,7 +185,7 @@ class Graph:
         self.graph[u].append(v)
 
     #Display graph
-    def graph_dispaly(self):
+    def graph_dispaly(self,log_file):
         # Graph display
         for key in self.graph:
             print("*********")
@@ -196,7 +196,7 @@ class Graph:
 
     # A function to perform a Depth-Limited search
     # from given source 'src'
-    def rechercheProfendeurLimite(self, src, target, maxDepth, chemin):
+    def rechercheProfendeurLimite(self, src, target, maxDepth, chemin, parcours, log_file):
 
         if src.vals[0] == target.vals[0] and src.vals[1] == target.vals[1]:
             chemin.append(src)
@@ -207,37 +207,39 @@ class Graph:
 
         # Recur for all the vertices adjacent to this vertex
         for i in self.graph[src]:
-            if self.rechercheProfendeurLimite(i, target, maxDepth - 1, chemin):
+            parcours.append(i)
+            if self.rechercheProfendeurLimite(i, target, maxDepth - 1, chemin, parcours, log_file):
                 chemin.append(i)
                 return True
         return False
 
-    def rechercheProfendeurLimiteseulinconnu(self, src, target, maxDepth, chemin):
+    def rechercheProfendeurLimiteseulinconnu(self, src, target, maxDepth, chemin, parcours, log_file):
         if src.vals[0] == target.vals[0]:
             chemin.append(src.vals[1])
         if src.vals[1] == target.vals[1]:
             chemin.append(src.vals[0])
         if maxDepth <= 0:
             for i in self.graph[src]:
-                self.rechercheProfendeurLimiteseulinconnu(i, target, maxDepth - 1, chemin)
+                parcours.append(i)
+                self.rechercheProfendeurLimiteseulinconnu(i, target, maxDepth - 1, chemin, parcours, log_file)
         return chemin
 
-    def rechercheProfendeurLimiteIteratif(self, src, target, maxDepth, chemin):
+    def rechercheProfendeurLimiteIteratif(self, src, target, maxDepth, chemin, parcours, log_file):
 
         # Repeatedly depth-limit search till the
         # maximum depth
         if not target.vals[0].isdigit() or not target.vals[1].isdigit():
             for i in range(maxDepth):
-                return self.rechercheProfendeurLimiteseulinconnu(src, target, i, chemin)
+                return self.rechercheProfendeurLimiteseulinconnu(src, target, i, chemin, parcours, log_file)
         else:
             for i in range(maxDepth):
-                if self.rechercheProfendeurLimite(src, target, i, chemin):
+                if self.rechercheProfendeurLimite(src, target, i, chemin, parcours, log_file):
                     return True
             return False
 
 
 
-    def a_star_search(self, start, goal):
+    def a_star_search(self, start, goal, log_file):
         openstates = [start]
         cost_so_far = {start: 0}
         came_from = {start: None}
